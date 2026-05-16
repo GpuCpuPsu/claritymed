@@ -1,0 +1,17 @@
+{
+  "name": "claritymed",
+  "version": "1.0.0",
+  "description": "Medical document and scan analyzer powered by Claude AI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.0",
+    "dotenv": "^16.4.5",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}
