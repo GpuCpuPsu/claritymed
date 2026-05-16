@@ -176,6 +176,12 @@
         <!-- Results content -->
         <div id="results-content" hidden>
 
+          <!-- Toolbar: Copy + New Analysis -->
+          <div class="results-toolbar">
+            <button class="toolbar-btn" id="copy-btn" type="button">Copy Results</button>
+            <button class="toolbar-btn secondary" id="new-analysis-btn" type="button">New Analysis</button>
+          </div>
+
           <!-- Urgency banner at top -->
           <div class="urgency-banner" id="urgency-banner">
             <div class="urgency-label-wrap">
@@ -225,6 +231,10 @@
           <div class="disclaimer" id="result-disclaimer"></div>
 
         </div><!-- /results-content -->
+
+        <!-- Scroll fade: gradient overlay that signals more content below.
+             position:sticky keeps it pinned to the bottom of the visible area. -->
+        <div class="scroll-fade" id="scroll-fade" hidden></div>
 
       </section><!-- /results-panel -->
 

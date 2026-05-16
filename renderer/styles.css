@@ -446,6 +446,52 @@ html, body {
 /* ── Results content ────────────────────────────────────────────────────── */
 #results-content { animation: fadeIn 0.35s ease; }
 
+/* Toolbar: Copy Results + New Analysis */
+.results-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.toolbar-btn {
+  padding: 7px 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: #0a1a0f;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.toolbar-btn:hover { background: var(--accent-dark); }
+
+.toolbar-btn.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.toolbar-btn.secondary:hover {
+  background: var(--bg-card);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-primary);
+}
+
+/* Scroll fade: sticky gradient pinned to the bottom of the results panel.
+   margin-top:-64px pulls it up so it overlaps the last content item.
+   pointer-events:none lets clicks pass through to content underneath. */
+.scroll-fade {
+  position: sticky;
+  bottom: 0;
+  height: 64px;
+  margin-top: -64px;
+  background: linear-gradient(to bottom, transparent, var(--bg-app));
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
 /* Urgency banner */
 .urgency-banner {
   background: var(--bg-card);

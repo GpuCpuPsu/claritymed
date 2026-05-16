@@ -9,6 +9,7 @@ let pdfBuffer = null;     // ArrayBuffer of the loaded PDF
 let imageDataUrl = null;  // base64 data URL of the loaded image
 let isAnalyzing = false;  // prevents double-clicks during analysis
 let isDemoMode = false;   // when true, returns hardcoded sample data instead of calling the API
+let lastResult = null;    // most recent analysis result, used by Copy Results
 
 // ─── Demo data ────────────────────────────────────────────────────────────
 // Realistic sample output used when Demo Mode is active.
@@ -45,12 +46,89 @@ const screenshotBtn   = document.getElementById('screenshot-btn');
 const retryBtn        = document.getElementById('retry-btn');
 const demoToggle      = document.getElementById('demo-toggle');
 const demoBanner      = document.getElementById('demo-banner');
+const copyBtn         = document.getElementById('copy-btn');
+const newAnalysisBtn  = document.getElementById('new-analysis-btn');
+const scrollFade      = document.getElementById('scroll-fade');
+const resultsPanel    = document.querySelector('.results-panel');
 
 const stateEmpty      = document.getElementById('state-empty');
 const stateLoading    = document.getElementById('state-loading');
 const stateError      = document.getElementById('state-error');
 const resultsContent  = document.getElementById('results-content');
 const errorMessage    = document.getElementById('error-message');
+
+// ─── Scroll fade ───────────────────────────────────────────────────────────
+// Show the fade whenever content overflows; hide it when scrolled to the bottom.
+function updateScrollFade() {
+  const atBottom = resultsPanel.scrollTop + resultsPanel.clientHeight >= resultsPanel.scrollHeight - 8;
+  const canScroll = resultsPanel.scrollHeight > resultsPanel.clientHeight;
+  scrollFade.hidden = !canScroll || atBottom;
+}
+
+resultsPanel.addEventListener('scroll', updateScrollFade);
+window.addEventListener('resize', updateScrollFade);
+
+// ─── Copy Results ──────────────────────────────────────────────────────────
+copyBtn.addEventListener('click', () => {
+  if (!lastResult) return;
+
+  const sep  = '─'.repeat(40);
+  const list = arr => (arr && arr.length) ? arr.map(i => `  • ${i}`).join('\n') : '  • None identified';
+
+  const text = [
+    'CLARITYMED ANALYSIS',
+    '═'.repeat(40),
+    '',
+    `URGENCY: ${lastResult.urgencyLevel}`,
+    lastResult.urgencyReason || '',
+    '',
+    'DIAGNOSIS', sep,
+    lastResult.diagnosis || 'None identified',
+    '',
+    'MEDICATIONS', sep,
+    list(lastResult.medications),
+    '',
+    'LAB FINDINGS', sep,
+    list(lastResult.labFindings),
+    '',
+    'FOLLOW-UP ACTIONS', sep,
+    list(lastResult.followUpActions),
+    '',
+    sep,
+    lastResult.disclaimer || '',
+  ].join('\n');
+
+  navigator.clipboard.writeText(text).then(() => {
+    const original = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => { copyBtn.textContent = original; }, 2000);
+  });
+});
+
+// ─── New Analysis ──────────────────────────────────────────────────────────
+newAnalysisBtn.addEventListener('click', resetApp);
+retryBtn.addEventListener('click', resetApp);
+
+function resetApp() {
+  // Clear all input state
+  pdfBuffer    = null;
+  imageDataUrl = null;
+  lastResult   = null;
+
+  document.getElementById('text-input').value = '';
+
+  const pdfLabel = document.getElementById('pdf-filename');
+  pdfLabel.textContent = '';
+  pdfLabel.hidden = true;
+
+  const previewWrap   = document.getElementById('image-preview-wrap');
+  const placeholder   = document.getElementById('image-drop-placeholder');
+  if (previewWrap)  previewWrap.hidden = true;
+  if (placeholder)  placeholder.style.display = 'flex';
+
+  resultsPanel.scrollTop = 0;
+  showEmpty();
+}
 
 // ─── Demo mode toggle ──────────────────────────────────────────────────────
 demoToggle.addEventListener('click', () => {
@@ -128,8 +206,7 @@ screenshotBtn.addEventListener('click', () => {
   });
 });
 
-// ─── Retry button ──────────────────────────────────────────────────────────
-retryBtn.addEventListener('click', () => showEmpty());
+// (retry is now wired to resetApp above)
 
 // ─── PDF file handling ─────────────────────────────────────────────────────
 setupDropZone({
@@ -303,6 +380,8 @@ function showError(msg) {
 
 // ─── Result rendering ──────────────────────────────────────────────────────
 function renderResults(data) {
+  lastResult = data; // save for Copy Results
+
   stateEmpty.hidden    = true;
   stateLoading.hidden  = true;
   stateError.hidden    = true;
@@ -332,8 +411,9 @@ function renderResults(data) {
   // ── Disclaimer ──
   document.getElementById('result-disclaimer').textContent = data.disclaimer || '';
 
-  // Scroll the results panel back to the top so the urgency banner is visible first
-  document.querySelector('.results-panel').scrollTop = 0;
+  // Scroll to top so urgency banner is visible first, then check if fade is needed
+  resultsPanel.scrollTop = 0;
+  requestAnimationFrame(updateScrollFade);
 }
 
 // Renders an array of strings as <li> elements inside a <ul>.
