@@ -65,6 +65,10 @@ function createWindow() {
       nodeIntegration: false,
       // Security: preload runs in an isolated V8 context and bridges via contextBridge
       contextIsolation: true,
+      // Electron 20+ enables sandbox by default, which strips desktopCapturer from
+      // the preload context. Disabling sandbox restores it. The renderer is still
+      // fully isolated via contextIsolation — nodeIntegration:false still applies.
+      sandbox: false,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
