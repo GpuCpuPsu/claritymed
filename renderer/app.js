@@ -8,18 +8,60 @@ let currentTab = 'text';  // which input tab is active
 let pdfBuffer = null;     // ArrayBuffer of the loaded PDF
 let imageDataUrl = null;  // base64 data URL of the loaded image
 let isAnalyzing = false;  // prevents double-clicks during analysis
+let isDemoMode = false;   // when true, returns hardcoded sample data instead of calling the API
+
+// ─── Demo data ────────────────────────────────────────────────────────────
+// Realistic sample output used when Demo Mode is active.
+const DEMO_RESULT = {
+  urgencyLevel: 'Moderate',
+  urgencyReason: 'Elevated blood pressure and abnormal cholesterol require follow-up within 1–2 weeks.',
+  diagnosis: 'You have been diagnosed with Stage 1 Hypertension (high blood pressure) and Hyperlipidemia (high cholesterol). These conditions mean your blood pressure and the amount of fat in your blood are higher than they should be. Both increase your risk of heart disease over time, but they are very manageable with lifestyle changes and medication.',
+  medications: [
+    'Lisinopril 10 mg — Take once daily in the morning. Lowers blood pressure by relaxing blood vessels.',
+    'Atorvastatin 20 mg — Take once daily at bedtime. Reduces bad (LDL) cholesterol to lower heart disease risk.',
+    'Aspirin 81 mg — Take once daily with food. Helps prevent blood clots from forming in blood vessels.',
+  ],
+  labFindings: [
+    'Blood Pressure: 142/91 mmHg — Above the normal range of 120/80. Classified as Stage 1 Hypertension.',
+    'LDL Cholesterol: 168 mg/dL — Higher than the ideal level of under 100 mg/dL. This is the "bad" cholesterol.',
+    'HDL Cholesterol: 42 mg/dL — Slightly low. This is the "good" cholesterol; above 60 is ideal.',
+    'Fasting Blood Glucose: 98 mg/dL — Normal (under 100 mg/dL). No signs of diabetes.',
+    'Creatinine (Kidney Function): 0.9 mg/dL — Normal. Your kidneys are working well.',
+  ],
+  followUpActions: [
+    'Schedule a follow-up appointment with your doctor in 2 weeks to recheck blood pressure.',
+    'Begin a low-sodium diet — aim for under 2,300 mg of salt per day. Avoid processed and canned foods.',
+    'Get at least 30 minutes of moderate exercise (brisk walking) most days of the week.',
+    'Monitor blood pressure at home daily and log readings to bring to your next appointment.',
+    'Repeat fasting cholesterol blood test in 3 months to check whether medication is working.',
+  ],
+  disclaimer: 'This analysis is for informational purposes only. Always consult your healthcare provider before making any medical decisions.',
+};
 
 // ─── DOM references ────────────────────────────────────────────────────────
 // Grabbing everything once at startup is faster than querying the DOM on each event.
 const analyzeBtn      = document.getElementById('analyze-btn');
 const screenshotBtn   = document.getElementById('screenshot-btn');
 const retryBtn        = document.getElementById('retry-btn');
+const demoToggle      = document.getElementById('demo-toggle');
+const demoBanner      = document.getElementById('demo-banner');
 
 const stateEmpty      = document.getElementById('state-empty');
 const stateLoading    = document.getElementById('state-loading');
 const stateError      = document.getElementById('state-error');
 const resultsContent  = document.getElementById('results-content');
 const errorMessage    = document.getElementById('error-message');
+
+// ─── Demo mode toggle ──────────────────────────────────────────────────────
+demoToggle.addEventListener('click', () => {
+  isDemoMode = !isDemoMode;
+  demoToggle.classList.toggle('active', isDemoMode);
+  demoToggle.textContent = isDemoMode ? '✓ Demo Mode' : 'Demo Mode';
+  // Show/hide the amber banner in the results panel
+  demoBanner.hidden = !isDemoMode;
+  // Reset to empty state so the user starts fresh in whichever mode they chose
+  showEmpty();
+});
 
 // ─── Tab switching ─────────────────────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -213,7 +255,14 @@ async function runAnalysis(apiCallFn) {
   showLoading();
 
   try {
-    const result = await apiCallFn();
+    let result;
+    if (isDemoMode) {
+      // Simulate realistic API latency so the loading state is visible
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      result = DEMO_RESULT;
+    } else {
+      result = await apiCallFn();
+    }
     renderResults(result);
   } catch (err) {
     // err.message comes from main.js — it wraps the actual error with context

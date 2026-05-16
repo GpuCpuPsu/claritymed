@@ -25,7 +25,10 @@
         </svg>
         <span class="logo-text">ClarityMed</span>
       </div>
-      <p class="tagline">Medical documents, explained clearly</p>
+      <div class="header-right">
+        <p class="tagline">Medical documents, explained clearly</p>
+        <button class="demo-btn" id="demo-toggle" type="button">Demo Mode</button>
+      </div>
     </header>
 
     <!-- ── Main two-panel layout ────────────────────────────────────── -->
@@ -130,6 +133,11 @@
 
       <!-- ────────────── RIGHT PANEL: Results ─────────────────────── -->
       <section class="results-panel" aria-live="polite">
+
+        <!-- Demo mode banner — visible only when demo mode is on -->
+        <div class="demo-banner" id="demo-banner" hidden>
+          ⚡ Demo Mode — sample data, no API call made
+        </div>
 
         <!-- Empty state -->
         <div class="state-screen" id="state-empty">
