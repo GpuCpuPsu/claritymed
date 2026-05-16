@@ -3,30 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!--
-    Content Security Policy: only load scripts/styles from our own files.
-    This prevents injected content from loading remote scripts.
-  -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; img-src 'self' data:; style-src 'self'">
+        content="default-src 'self'; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com">
   <title>ClarityMed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app-layout">
+<div class="app-layout">
 
-    <!-- ── Header ──────────────────────────────────────────────────── -->
-    <header class="app-header">
-      <div class="logo">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- ══════════════════════════════════════════════════════
+       LEFT SIDEBAR — brand + vertical nav + input content
+  ══════════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/>
           <path d="M2 17l10 5 10-5"/>
           <path d="M2 12l10 5 10-5"/>
         </svg>
-        <span class="logo-text">ClarityMed</span>
+      </div>
+      <span class="brand-name">ClarityMed</span>
+    </div>
+
+    <!-- Vertical nav -->
+    <nav class="sidebar-nav" role="tablist">
+      <p class="nav-section-label">Analysis Type</p>
+
+      <button class="nav-item active" data-tab="text" role="tab" aria-selected="true">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Clinical Text
+      </button>
+
+      <button class="nav-item" data-tab="pdf" role="tab" aria-selected="false">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10,9 9,9 8,9"/>
+        </svg>
+        PDF Document
+      </button>
+
+      <button class="nav-item" data-tab="image" role="tab" aria-selected="false">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21,15 16,10 5,21"/>
+        </svg>
+        Medical Image
+      </button>
+
+      <button class="nav-item" data-tab="screenshot" role="tab" aria-selected="false">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        Screenshot
+      </button>
+    </nav>
+
+    <!-- Input content for the selected nav item -->
+    <div class="sidebar-content">
+
+      <!-- Text tab -->
+      <div class="tab-content active" id="tab-text" role="tabpanel">
+        <label class="input-label" for="text-input">Clinical Notes / Lab Results</label>
+        <textarea
+          id="text-input"
+          placeholder="Paste or type clinical notes, discharge summaries, or lab results here…"
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <!-- PDF tab -->
+      <div class="tab-content" id="tab-pdf" role="tabpanel">
+        <div class="drop-zone" id="pdf-drop" tabindex="0" role="button" aria-label="Drop PDF here or click to browse">
+          <div class="drop-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+          </div>
+          <p class="drop-primary">Drop a PDF here</p>
+          <p class="drop-secondary">Lab reports, discharge summaries</p>
+          <button class="file-btn" id="pdf-select-btn" type="button">Browse Files</button>
+          <input type="file" id="pdf-input" accept=".pdf" hidden aria-hidden="true">
+          <p class="file-name" id="pdf-filename" hidden></p>
+        </div>
+      </div>
+
+      <!-- Image tab -->
+      <div class="tab-content" id="tab-image" role="tabpanel">
+        <div class="drop-zone" id="image-drop" tabindex="0" role="button" aria-label="Drop image here or click to browse">
+          <div class="image-preview-wrap" id="image-preview-wrap" hidden>
+            <img id="preview-img" alt="Selected medical image preview">
+          </div>
+          <div class="drop-placeholder" id="image-drop-placeholder">
+            <div class="drop-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21,15 16,10 5,21"/>
+              </svg>
+            </div>
+            <p class="drop-primary">Drop an image here</p>
+            <p class="drop-secondary">X-ray · MRI · CT · Ultrasound</p>
+            <button class="file-btn" id="image-select-btn" type="button">Browse Files</button>
+            <input type="file" id="image-input" accept="image/jpeg,image/png,image/gif,image/webp" hidden aria-hidden="true">
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot tab -->
+      <div class="tab-content" id="tab-screenshot" role="tabpanel">
+        <div class="screenshot-panel">
+          <div class="screenshot-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <p class="drop-primary">Capture Screen</p>
+          <p class="drop-secondary">Captures your screen and sends it to Claude for analysis</p>
+          <button class="capture-btn" id="screenshot-btn" type="button">Capture &amp; Analyze</button>
+        </div>
+      </div>
+
+    </div><!-- /sidebar-content -->
+
+    <!-- Analyze button pinned to sidebar bottom -->
+    <div class="sidebar-footer">
+      <button class="analyze-btn" id="analyze-btn" type="button">Analyze Document</button>
+    </div>
+
+  </aside><!-- /sidebar -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       RIGHT PANEL — header + results
+  ══════════════════════════════════════════════════════ -->
+  <div class="right-panel">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="header-title">Medical Document Analyzer</h1>
+        <span class="header-sub">Powered by Claude AI</span>
       </div>
       <div class="header-right">
-        <p class="tagline">Medical documents, explained clearly</p>
         <button class="demo-btn" id="demo-toggle" type="button">Demo Mode</button>
         <div class="about-wrap">
           <button class="about-btn" type="button" aria-label="About ClarityMed">?</button>
@@ -46,216 +184,109 @@
       </div>
     </header>
 
-    <!-- ── Main two-panel layout ────────────────────────────────────── -->
-    <main class="app-main">
+    <!-- Results panel -->
+    <section class="results-panel" aria-live="polite">
 
-      <!-- ────────────── LEFT PANEL: Input ────────────────────────── -->
-      <aside class="input-panel">
+      <!-- Demo mode info bar -->
+      <div class="demo-banner" id="demo-banner" hidden>
+        Demo Mode — sample data only
+      </div>
 
-        <!-- Tab navigation -->
-        <nav class="tab-nav" role="tablist">
-          <button class="tab-btn active" data-tab="text" role="tab" aria-selected="true">
-            <span class="tab-icon">✏️</span> Text
-          </button>
-          <button class="tab-btn" data-tab="pdf" role="tab" aria-selected="false">
-            <span class="tab-icon">📄</span> PDF
-          </button>
-          <button class="tab-btn" data-tab="image" role="tab" aria-selected="false">
-            <span class="tab-icon">🔬</span> Image
-          </button>
-          <button class="tab-btn" data-tab="screenshot" role="tab" aria-selected="false">
-            <span class="tab-icon">📸</span> Screen
-          </button>
-        </nav>
+      <!-- Empty state -->
+      <div class="state-screen" id="state-empty">
+        <div class="state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <h2>Ready to Analyze</h2>
+        <p>Select an analysis type from the left panel, enter your content, then click <strong>Analyze Document</strong>.</p>
+      </div>
 
-        <!-- Tab: Text input -->
-        <div class="tab-content active" id="tab-text" role="tabpanel">
-          <label class="input-label" for="text-input">Clinical Notes / Lab Results</label>
-          <textarea
-            id="text-input"
-            placeholder="Paste or type clinical notes, discharge summaries, lab results, or doctor notes here…"
-            spellcheck="false"
-          ></textarea>
+      <!-- Loading state -->
+      <div class="state-screen" id="state-loading" hidden>
+        <div class="spinner"></div>
+        <p class="loading-text">Analyzing your document…</p>
+        <p class="loading-sub">Claude is reading and summarizing</p>
+      </div>
+
+      <!-- Error state -->
+      <div class="state-screen" id="state-error" hidden>
+        <div class="state-icon error-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h3>Analysis Failed</h3>
+        <p id="error-message" class="error-text"></p>
+        <button class="retry-btn" id="retry-btn" type="button">Start Over</button>
+      </div>
+
+      <!-- Results content -->
+      <div id="results-content" hidden>
+
+        <!-- Toolbar -->
+        <div class="results-toolbar">
+          <button class="toolbar-btn" id="copy-btn" type="button">Copy Results</button>
+          <button class="toolbar-btn secondary" id="new-analysis-btn" type="button">New Analysis</button>
         </div>
 
-        <!-- Tab: PDF upload -->
-        <div class="tab-content" id="tab-pdf" role="tabpanel">
-          <div class="drop-zone" id="pdf-drop" tabindex="0" role="button" aria-label="Drop PDF here or click to browse">
-            <div class="drop-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-                <line x1="12" y1="18" x2="12" y2="12"/>
-                <line x1="9" y1="15" x2="15" y2="15"/>
-              </svg>
-            </div>
-            <p class="drop-primary">Drag &amp; drop a PDF here</p>
-            <p class="drop-secondary">Lab reports, discharge summaries, prescriptions</p>
-            <button class="file-btn" id="pdf-select-btn" type="button">Browse Files</button>
-            <input type="file" id="pdf-input" accept=".pdf" hidden aria-hidden="true">
-            <p class="file-name" id="pdf-filename" hidden></p>
+        <!-- Urgency card — gets .routine / .moderate / .urgent class applied by JS -->
+        <div class="urgency-banner" id="urgency-banner">
+          <div class="urgency-label-wrap">
+            <span class="urgency-label">Urgency Level</span>
+            <span class="urgency-badge" id="urgency-badge">Routine</span>
           </div>
+          <p class="urgency-reason" id="urgency-reason"></p>
         </div>
 
-        <!-- Tab: Image upload -->
-        <div class="tab-content" id="tab-image" role="tabpanel">
-          <div class="drop-zone" id="image-drop" tabindex="0" role="button" aria-label="Drop image here or click to browse">
-            <div class="image-preview-wrap" id="image-preview-wrap" hidden>
-              <img id="preview-img" alt="Selected medical image preview">
-            </div>
-            <div class="drop-placeholder" id="image-drop-placeholder">
-              <div class="drop-icon-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21,15 16,10 5,21"/>
-                </svg>
-              </div>
-              <p class="drop-primary">Drag &amp; drop a medical image</p>
-              <p class="drop-secondary">X-ray · MRI · CT scan · Ultrasound · JPEG · PNG</p>
-              <button class="file-btn" id="image-select-btn" type="button">Browse Files</button>
-              <input type="file" id="image-input" accept="image/jpeg,image/png,image/gif,image/webp" hidden aria-hidden="true">
-            </div>
-          </div>
-        </div>
+        <!-- Diagnosis -->
+        <section class="result-section">
+          <h3 class="section-title">
+            <span class="section-dot diagnosis-dot"></span>Diagnosis
+          </h3>
+          <p id="result-diagnosis" class="result-text"></p>
+        </section>
 
-        <!-- Tab: Screenshot capture -->
-        <div class="tab-content" id="tab-screenshot" role="tabpanel">
-          <div class="screenshot-panel">
-            <div class="drop-icon-wrap screenshot-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-            </div>
-            <p class="drop-primary">Capture Screen</p>
-            <p class="drop-secondary">
-              Captures your current screen and sends it to Claude.<br>
-              Useful for telehealth portals, on-screen results, or any clinical content you can see.
-            </p>
-            <button class="capture-btn" id="screenshot-btn" type="button">
-              Capture &amp; Analyze Screen
-            </button>
-          </div>
-        </div>
+        <!-- Medications -->
+        <section class="result-section">
+          <h3 class="section-title">
+            <span class="section-dot medications-dot"></span>Medications
+          </h3>
+          <ul id="result-medications" class="result-list"></ul>
+        </section>
 
-        <!-- Main analyze button (hidden on screenshot tab — that tab has its own button) -->
-        <button class="analyze-btn" id="analyze-btn" type="button">
-          Analyze Document
-        </button>
+        <!-- Lab Findings -->
+        <section class="result-section">
+          <h3 class="section-title">
+            <span class="section-dot lab-dot"></span>Lab Findings
+          </h3>
+          <ul id="result-lab-findings" class="result-list"></ul>
+        </section>
 
-      </aside><!-- /input-panel -->
+        <!-- Follow-Up Actions -->
+        <section class="result-section">
+          <h3 class="section-title">
+            <span class="section-dot followup-dot"></span>Follow-Up Actions
+          </h3>
+          <ul id="result-follow-up" class="result-list"></ul>
+        </section>
 
-      <!-- ────────────── RIGHT PANEL: Results ─────────────────────── -->
-      <section class="results-panel" aria-live="polite">
+        <!-- Disclaimer -->
+        <div class="disclaimer" id="result-disclaimer"></div>
 
-        <!-- Demo mode banner — visible only when demo mode is on -->
-        <div class="demo-banner" id="demo-banner" hidden>
-          ⚡ Demo Mode — sample data, no API call made
-        </div>
+      </div><!-- /results-content -->
 
-        <!-- Empty state -->
-        <div class="state-screen" id="state-empty">
-          <div class="state-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <h2>Ready to Analyze</h2>
-          <p>Choose an input method on the left, then click <strong>Analyze Document</strong>.</p>
-        </div>
+      <!-- Scroll fade -->
+      <div class="scroll-fade" id="scroll-fade" hidden></div>
 
-        <!-- Loading state -->
-        <div class="state-screen" id="state-loading" hidden>
-          <div class="spinner"></div>
-          <p class="loading-text">Analyzing your medical document…</p>
-          <p class="loading-sub">Claude is reading and summarizing</p>
-        </div>
+    </section><!-- /results-panel -->
 
-        <!-- Error state -->
-        <div class="state-screen" id="state-error" hidden>
-          <div class="state-icon error-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-          </div>
-          <h3>Analysis Failed</h3>
-          <p id="error-message" class="error-text"></p>
-          <button class="retry-btn" id="retry-btn" type="button">Try Again</button>
-        </div>
+  </div><!-- /right-panel -->
 
-        <!-- Results content -->
-        <div id="results-content" hidden>
-
-          <!-- Toolbar: Copy + New Analysis -->
-          <div class="results-toolbar">
-            <button class="toolbar-btn" id="copy-btn" type="button">Copy Results</button>
-            <button class="toolbar-btn secondary" id="new-analysis-btn" type="button">New Analysis</button>
-          </div>
-
-          <!-- Urgency banner at top -->
-          <div class="urgency-banner" id="urgency-banner">
-            <div class="urgency-label-wrap">
-              <span class="urgency-label">Urgency Level</span>
-              <span class="urgency-badge" id="urgency-badge">Routine</span>
-            </div>
-            <p class="urgency-reason" id="urgency-reason"></p>
-          </div>
-
-          <!-- Diagnosis -->
-          <section class="result-section">
-            <h3 class="section-title">
-              <span class="section-dot diagnosis-dot"></span>
-              Diagnosis
-            </h3>
-            <p id="result-diagnosis" class="result-text"></p>
-          </section>
-
-          <!-- Medications -->
-          <section class="result-section">
-            <h3 class="section-title">
-              <span class="section-dot medications-dot"></span>
-              Medications
-            </h3>
-            <ul id="result-medications" class="result-list"></ul>
-          </section>
-
-          <!-- Lab Findings -->
-          <section class="result-section">
-            <h3 class="section-title">
-              <span class="section-dot lab-dot"></span>
-              Lab Findings
-            </h3>
-            <ul id="result-lab-findings" class="result-list"></ul>
-          </section>
-
-          <!-- Follow-Up Actions -->
-          <section class="result-section">
-            <h3 class="section-title">
-              <span class="section-dot followup-dot"></span>
-              Follow-Up Actions
-            </h3>
-            <ul id="result-follow-up" class="result-list"></ul>
-          </section>
-
-          <!-- Medical disclaimer -->
-          <div class="disclaimer" id="result-disclaimer"></div>
-
-        </div><!-- /results-content -->
-
-        <!-- Scroll fade: gradient overlay that signals more content below.
-             position:sticky keeps it pinned to the bottom of the visible area. -->
-        <div class="scroll-fade" id="scroll-fade" hidden></div>
-
-      </section><!-- /results-panel -->
-
-    </main>
-  </div><!-- /app-layout -->
-
-  <script src="app.js"></script>
+</div><!-- /app-layout -->
+<script src="app.js"></script>
 </body>
 </html>

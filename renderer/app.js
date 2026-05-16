@@ -200,15 +200,14 @@ demoToggle.addEventListener('click', () => {
 });
 
 // ─── Tab switching ─────────────────────────────────────────────────────────
-document.querySelectorAll('.tab-btn').forEach(btn => {
+document.querySelectorAll('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
 function switchTab(tab) {
   currentTab = tab;
 
-  // Update aria-selected attributes (accessibility)
-  document.querySelectorAll('.tab-btn').forEach(b => {
+  document.querySelectorAll('.nav-item').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tab);
     b.setAttribute('aria-selected', b.dataset.tab === tab);
   });
@@ -444,15 +443,17 @@ function renderResults(data) {
   stateError.hidden    = true;
   resultsContent.hidden = false;
 
-  // ── Urgency badge ──
+  // ── Urgency badge + banner left-border ──
   const badge = document.getElementById('urgency-badge');
-  // Normalise to title-case in case Claude capitalises differently
   const level = (data.urgencyLevel || 'Routine').trim();
-  badge.textContent = level;
-  // Remove all level classes then add the correct one
-  badge.className = 'urgency-badge';
   const levelClass = { Routine: 'routine', Moderate: 'moderate', Urgent: 'urgent' }[level] || 'routine';
-  badge.classList.add(levelClass);
+
+  badge.textContent = level;
+  badge.className = 'urgency-badge ' + levelClass;
+
+  // The urgency-banner card uses a colored left border — apply the same class
+  const bannerCard = document.getElementById('urgency-banner');
+  bannerCard.className = 'urgency-banner ' + levelClass;
 
   document.getElementById('urgency-reason').textContent = data.urgencyReason || '';
 
