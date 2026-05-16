@@ -12,8 +12,10 @@ let isDemoMode = false;   // when true, returns hardcoded sample data instead of
 let lastResult = null;    // most recent analysis result, used by Copy Results
 
 // ─── Demo data ────────────────────────────────────────────────────────────
-// Realistic sample output used when Demo Mode is active.
-const DEMO_RESULT = {
+// Each tab gets its own realistic sample so the demo tells a complete story.
+
+// Text / PDF tab: lab report with hypertension and high cholesterol
+const DEMO_TEXT = {
   urgencyLevel: 'Moderate',
   urgencyReason: 'Elevated blood pressure and abnormal cholesterol require follow-up within 1–2 weeks.',
   diagnosis: 'You have been diagnosed with Stage 1 Hypertension (high blood pressure) and Hyperlipidemia (high cholesterol). These conditions mean your blood pressure and the amount of fat in your blood are higher than they should be. Both increase your risk of heart disease over time, but they are very manageable with lifestyle changes and medication.',
@@ -38,6 +40,62 @@ const DEMO_RESULT = {
   ],
   disclaimer: 'This analysis is for informational purposes only. Always consult your healthcare provider before making any medical decisions.',
 };
+
+// Image tab: lumbar MRI showing a herniated disc
+const DEMO_IMAGE = {
+  urgencyLevel: 'Moderate',
+  urgencyReason: 'Findings consistent with a lumbar disc herniation warrant evaluation by a spine specialist within 1–2 weeks.',
+  diagnosis: 'This MRI of the lower spine shows a herniated disc at the L4–L5 level. A herniated disc happens when the soft cushion between two spinal bones bulges out of place and mildly presses on a nearby nerve. This is a common condition that often improves with physical therapy and does not always require surgery.',
+  medications: [
+    'Ibuprofen 600 mg — Take every 8 hours with food as needed for pain and swelling.',
+    'Cyclobenzaprine 5 mg — Take at bedtime as needed. A muscle relaxant to reduce lower back spasm.',
+    'Diclofenac Gel 1% — Apply to the lower back twice daily for local pain relief.',
+  ],
+  labFindings: [
+    'L4–L5 disc: Moderate posterior herniation with mild compression of the left nerve root.',
+    'L5–S1 disc: Mild degenerative changes. No significant herniation.',
+    'Spinal canal: No critical narrowing (stenosis) detected at any level.',
+    'Vertebral alignment: Normal. No fractures or bone abnormalities identified.',
+    'Paraspinal muscles: Mild asymmetry consistent with protective muscle guarding.',
+  ],
+  followUpActions: [
+    'Refer to a spine specialist (orthopedic surgeon or physiatrist) for further evaluation.',
+    'Begin physical therapy focused on core strengthening and lumbar stabilisation.',
+    'Avoid heavy lifting and prolonged sitting — stand or walk for 5 minutes every 30 minutes.',
+    'Apply ice for 15 minutes after activity; use heat for 15 minutes before gentle stretching.',
+    'Return immediately if you develop leg weakness, numbness in the groin, or loss of bladder/bowel control — these are emergency symptoms.',
+  ],
+  disclaimer: 'This analysis is for informational purposes only. Always consult your healthcare provider before making any medical decisions.',
+};
+
+// Screen tab: telehealth annual wellness visit summary
+const DEMO_SCREEN = {
+  urgencyLevel: 'Routine',
+  urgencyReason: 'Annual wellness visit with all major values within normal limits. No immediate concerns identified.',
+  diagnosis: 'This appears to be a telehealth annual wellness visit summary. All major lab results are within normal range. You are in good general health. The visit notes include routine preventive care recommendations appropriate for your age group, along with a mild Vitamin D insufficiency that is easily corrected with supplementation.',
+  medications: [
+    'Vitamin D3 2,000 IU — Take once daily with a meal. Recommended due to mild insufficiency on last bloodwork.',
+    'Daily multivitamin — Take once daily. General nutritional support.',
+  ],
+  labFindings: [
+    'Complete Blood Count (CBC): All values normal. No signs of anaemia or infection.',
+    'Comprehensive Metabolic Panel: Liver enzymes, kidney function, and electrolytes all normal.',
+    'Vitamin D: 28 ng/mL — Slightly below the optimal range of 30–80 ng/mL. Supplement recommended.',
+    'TSH (Thyroid): 2.1 mIU/L — Normal. Thyroid function is healthy.',
+    'HbA1c (3-month blood sugar average): 5.4% — Normal. No signs of pre-diabetes.',
+  ],
+  followUpActions: [
+    'Schedule next annual wellness visit in 12 months.',
+    'Complete the age-appropriate cancer screenings discussed during this visit.',
+    'Continue current exercise routine — provider noted cardiorespiratory fitness is good.',
+    'Take Vitamin D supplement daily and have levels rechecked in 3 months.',
+    'Maintain a balanced diet rich in whole foods and leafy greens to support Vitamin D absorption.',
+  ],
+  disclaimer: 'This analysis is for informational purposes only. Always consult your healthcare provider before making any medical decisions.',
+};
+
+// Map each tab to its corresponding demo dataset
+const DEMO_BY_TAB = { text: DEMO_TEXT, pdf: DEMO_TEXT, image: DEMO_IMAGE, screenshot: DEMO_SCREEN };
 
 // ─── DOM references ────────────────────────────────────────────────────────
 // Grabbing everything once at startup is faster than querying the DOM on each event.
@@ -334,9 +392,8 @@ async function runAnalysis(apiCallFn) {
   try {
     let result;
     if (isDemoMode) {
-      // Simulate realistic API latency so the loading state is visible
       await new Promise(resolve => setTimeout(resolve, 1200));
-      result = DEMO_RESULT;
+      result = DEMO_BY_TAB[currentTab] || DEMO_TEXT;
     } else {
       result = await apiCallFn();
     }
